@@ -1,4 +1,4 @@
-function getProductDetails() {
+window.onload = function() {
 
     /*récupération de l'id à partir de l'URL */
     var str = document.URL;
@@ -14,23 +14,32 @@ function getProductDetails() {
             console.log(data);
             //création de l'élement de l'image
             var image = document.querySelector(".item__img");
-            let imgTag = document.createElement('div');
-            imgTag.innerHTML = '<img src="' + data.imageUrl + '" alt="' + data.altTxt + '">';
-            image.appendChild(imgTag);
+            image.innerHTML = '<img src="' + data.imageUrl + '" alt="' + data.altTxt + '">';
 
             //création de l'élement title
             var title = document.getElementById('title');
-            title.append(data.name);
-
+            title.textContent = data.name;
             
            //création de l'élement prix
             var prix = document.getElementById('pre');
-            prix.append(data.price);
-
+            prix.textContent = data.price;
+           
             //création de l'élement description
             var description = document.getElementById('description');
-            description.append(data.description);
+            description.textContent = data.description;
 
+           //création de l'élement couleur
+           var couleur = document.getElementById('colors');
+            for (const color of data.colors) {
+                console.log(color); 
+                let option = document.createElement('option');
+                option.value = color;
+                option.textContent = color;
+                couleur.appendChild(option);
+             }
+
+            // création de l'élément bouton
+          
 
         })
         .catch((error) => console.log("impossible de récupérer les données"));

@@ -1,4 +1,5 @@
-function loadArticles() {
+window.onload = function() {
+
     //récupération de l'élement html items selon l'id
     var item = document.getElementById('items');
     //appel à l'API pour récupérer tout les éléments
@@ -22,13 +23,13 @@ function loadArticles() {
                 //création de l'élement h3
                 let h3Tag = document.createElement('h3');
                 h3Tag.class='productName';
-                h3Tag.innerHTML=obj.name;
+                h3Tag.textContent=obj.name;
                 articleTag.appendChild(h3Tag);
 
                 //création de l'élement p
                 let pTag = document.createElement('p');
                 pTag.class='productDescription';
-                pTag.innerHTML=obj.description;
+                pTag.textContent=obj.description;
                 articleTag.appendChild(pTag);
 
                 aTag.appendChild(articleTag);
