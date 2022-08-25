@@ -31,7 +31,6 @@ window.onload = function() {
                 pTag.class='productDescription';
                 pTag.textContent=obj.description;
                 articleTag.appendChild(pTag);
-
                 aTag.appendChild(articleTag);
                 item.appendChild(aTag);
 
