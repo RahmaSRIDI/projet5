@@ -38,7 +38,7 @@ window.onload = function () {
                 couleur.appendChild(option);
             }
 
-            //création du lien vers la page panier
+            //reuperation des données envoyé par localstorage
 
             let addToCartButton = document.getElementById('addToCart');
             addToCartButton.onclick = function (event) {
