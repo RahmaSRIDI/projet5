@@ -13,8 +13,11 @@ window.onload = function () {
         .then((data) => {
             console.log(data);
             //création de l'élement de l'image
-            var image = document.querySelector(".item__img");
-            image.innerHTML = '<img src="' + data.imageUrl + '" alt="' + data.altTxt + '">';
+            var imageDiv = document.querySelector(".item__img");
+            let image = document.createElement('img');
+            image.src = data.imageUrl;
+            image.alt = data.altTxt;
+            imageDiv.appendChild(image);
 
             //création de l'élement title
             var title = document.getElementById('title');
@@ -41,7 +44,7 @@ window.onload = function () {
             //reuperation des données envoyé par localstorage
 
             let addToCartButton = document.getElementById('addToCart');
-            addToCartButton.onclick = function (event) {
+            addToCartButton.addEventListener('click', function(e) {
 
                 console.log(data.name);
 
@@ -55,25 +58,28 @@ window.onload = function () {
                 var quantiteSelected = quantiteSelectedTag.value;
                 console.log(quantiteSelected);
 
-                /*let objJson = {
-                    id: idFromUrl,
-                    color: colorSelected,
-                    quantite: quantiteSelected
-                }
-                let produit = JSON.stringify(objJson);
-                
-                if (localStorage.getItem(idFromUrl) !== null) {
-                    //element existe 
-                    //donc vérification de la couleur
-                    console.log(`element existe `);
-                } else {
-                    //inserer element car il n'existe pas
-                    localStorage.setItem(idFromUrl, produit);
-                }
-                
-                console.log(localStorage.getItem(idFromUrl));*/
-            }
+                // let objJson = {
+                //     id: idFromUrl,
+                //     color: colorSelected,
+                //     quantite: quantiteSelected
+                // }
+                // let produit = JSON.stringify(objJson);
+
+                // if (localStorage.getItem(idFromUrl) !== null) {
+                //     //element existe 
+                //     //donc vérification de la couleur
+                //     console.log(`element existe `);
+                //     let existedObjJson = JSON.parse(window.localStorage.getItem('user'));
+                //     console.log(existedObjJson);
+
+                // } else {
+                //     //inserer element car il n'existe pas
+                //     localStorage.setItem(idFromUrl, produit);
+                // }
+
+                // console.log(localStorage.getItem(idFromUrl));
+            })
 
         })
-        .catch((error) => console.log("impossible de récupérer les données"));
+        .catch((error) => console.log("impossible de récupérer les données",error));
 }
