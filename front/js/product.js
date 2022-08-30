@@ -12,6 +12,8 @@ window.onload = function () {
         .then((response) => response.json())
         .then((data) => {
             console.log(data);
+
+
             //création de l'élement de l'image
             var imageDiv = document.querySelector(".item__img");
             let image = document.createElement('img');
@@ -44,42 +46,40 @@ window.onload = function () {
             //reuperation des données envoyé par localstorage
 
             let addToCartButton = document.getElementById('addToCart');
-            addToCartButton.addEventListener('click', function(e) {
+            addToCartButton.addEventListener('click', function (e) {
 
                 console.log(data.name);
 
                 var colorSelectedTag = document.getElementById("colors");
                 var colorSelected = colorSelectedTag.value;
-
-                //var text = e.options[e.selectedIndex].text;
                 console.log(colorSelected);
-
+                //var text = e.options[e.selectedIndex].text;
                 var quantiteSelectedTag = document.getElementById("quantity");
                 var quantiteSelected = quantiteSelectedTag.value;
                 console.log(quantiteSelected);
 
-                // let objJson = {
-                //     id: idFromUrl,
-                //     color: colorSelected,
-                //     quantite: quantiteSelected
-                // }
-                // let produit = JSON.stringify(objJson);
+                let objJson = {
+                    id: idFromUrl,
+                    color: colorSelected,
+                    quantite: Number(quantiteSelected)
+                }
+                //check
+                if (localStorage.getItem(idFromUrl + colorSelected) !== null) {
+                    let existedObjJson=JSON.parse(localStorage.getItem(idFromUrl + colorSelected)); 
+                    //element existe 
+                    //donc vérification de la couleur
+                    console.log(`element and color existe `);
+                    console.log(`existedObjJson===`,existedObjJson);
+                    console.log(`Number(objJson.quantite===`,Number(objJson.quantite));
+                    console.log(`Number(existedObjJson.quantite)== `,Number(existedObjJson.quantite));
+                    objJson.quantite = Number(objJson.quantite) + Number(existedObjJson.quantite);
+                }
+                let produit = JSON.stringify(objJson);
+                localStorage.setItem(idFromUrl + objJson.color, produit);
 
-                // if (localStorage.getItem(idFromUrl) !== null) {
-                //     //element existe 
-                //     //donc vérification de la couleur
-                //     console.log(`element existe `);
-                //     let existedObjJson = JSON.parse(window.localStorage.getItem('user'));
-                //     console.log(existedObjJson);
-
-                // } else {
-                //     //inserer element car il n'existe pas
-                //     localStorage.setItem(idFromUrl, produit);
-                // }
-
-                // console.log(localStorage.getItem(idFromUrl));
+                
             })
 
         })
-        .catch((error) => console.log("impossible de récupérer les données",error));
+        .catch((error) => console.log("impossible de récupérer les données", error));
 }
