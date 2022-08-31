@@ -57,27 +57,35 @@ window.onload = function () {
                 var quantiteSelectedTag = document.getElementById("quantity");
                 var quantiteSelected = quantiteSelectedTag.value;
                 console.log(quantiteSelected);
+                if (colorSelected != "" && quantiteSelected > 0) {
+                    
+                    let objJson = {
+                        id: idFromUrl,
+                        color: colorSelected,
+                        quantite: Number(quantiteSelected)
+                    }
+                    //check
+                    if (localStorage.getItem(idFromUrl + colorSelected) !== null) {
+                        let existedObjJson = JSON.parse(localStorage.getItem(idFromUrl + colorSelected));
+                        //element existe 
+                        //donc vérification de la couleur
+                        console.log(`element and color existe `);
+                        console.log(`existedObjJson===`, existedObjJson);
+                        console.log(`Number(objJson.quantite===`, Number(objJson.quantite));
+                        console.log(`Number(existedObjJson.quantite)== `, Number(existedObjJson.quantite));
+                        objJson.quantite = Number(objJson.quantite) + Number(existedObjJson.quantite);
+                    }
 
-                let objJson = {
-                    id: idFromUrl,
-                    color: colorSelected,
-                    quantite: Number(quantiteSelected)
-                }
-                //check
-                if (localStorage.getItem(idFromUrl + colorSelected) !== null) {
-                    let existedObjJson=JSON.parse(localStorage.getItem(idFromUrl + colorSelected)); 
-                    //element existe 
-                    //donc vérification de la couleur
-                    console.log(`element and color existe `);
-                    console.log(`existedObjJson===`,existedObjJson);
-                    console.log(`Number(objJson.quantite===`,Number(objJson.quantite));
-                    console.log(`Number(existedObjJson.quantite)== `,Number(existedObjJson.quantite));
-                    objJson.quantite = Number(objJson.quantite) + Number(existedObjJson.quantite);
-                }
-                let produit = JSON.stringify(objJson);
-                localStorage.setItem(idFromUrl + objJson.color, produit);
 
-                
+
+                    let produit = JSON.stringify(objJson);
+                    localStorage.setItem(idFromUrl + objJson.color, produit);
+                }
+                else {
+                    alert("Veuillez choisir une couleur et un nombre d'article svp");
+                }
+
+
             })
 
         })
