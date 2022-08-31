@@ -1,4 +1,4 @@
-window.onload = function () {
+function getProduct() {
 
     /*récupération de l'id à partir de l'URL */
     var str = document.URL;
@@ -58,7 +58,7 @@ window.onload = function () {
                 var quantiteSelected = quantiteSelectedTag.value;
                 console.log(quantiteSelected);
                 if (colorSelected != "" && quantiteSelected > 0) {
-                    
+
                     let objJson = {
                         id: idFromUrl,
                         color: colorSelected,
@@ -91,3 +91,4 @@ window.onload = function () {
         })
         .catch((error) => console.log("impossible de récupérer les données", error));
 }
+getProduct();
