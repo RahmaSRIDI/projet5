@@ -5,7 +5,6 @@ function getCard() {
         var key = localStorage.key(i);
         var elementObjJson = JSON.parse(localStorage.getItem(key));
 
-        console.log(elementObjJson);
 
         let article = document.createElement('article');
         article.setAttribute('class', 'cart__item');
@@ -16,11 +15,11 @@ function getCard() {
         div_cart__item__img.setAttribute('class', 'cart__item__img');
 
         var productURL = "http://localhost:3000/api/products/" + elementObjJson.id;
-        console.log("productURL", productURL);
+
         const results = fetch(productURL)
             .then((response) => response.json())
             .then((data) => {
-                console.log(data);
+
                 let imgTag = document.createElement('img');
                 imgTag.src = data.imageUrl;
                 imgTag.alt = data.altTxt;
@@ -38,8 +37,8 @@ function getCard() {
                 pColor.textContent = elementObjJson.color;
                 let pPrix = document.createElement('p');
                 //convert string to amount
-                let price=data.price;
-                let priceText = price.toLocaleString("fr-FR", {style:"currency", currency:"EUR"});
+                let price = data.price;
+                let priceText = price.toLocaleString("fr-FR", { style: "currency", currency: "EUR" });
                 pPrix.textContent = priceText;
                 div_cart__item__content__description.appendChild(h2);
                 div_cart__item__content__description.appendChild(pColor);
@@ -49,7 +48,7 @@ function getCard() {
 
                 //cart__item__content__settings
                 let div_cart__item__content__settings = document.createElement('div');
-                let div_cart__item__content__settings__quantity=document.createElement('div');
+                let div_cart__item__content__settings__quantity = document.createElement('div');
                 let pQte = document.createElement('p');
                 pQte.textContent = "Qté : ";
                 let input = document.createElement('input');
@@ -70,23 +69,48 @@ function getCard() {
                 div_cart__item__content__settings__delete.setAttribute('class', 'cart__item__content__settings__delete');
                 let pDelete = document.createElement('p');
                 pDelete.setAttribute('class', 'deleteItem');
-                pDelete.textContent='Supprimer';
+                pDelete.textContent = 'Supprimer';
                 div_cart__item__content__settings__delete.appendChild(pDelete);
                 div_cart__item__content__settings.appendChild(div_cart__item__content__settings__delete);
 
 
                 article.appendChild(div_cart__item__content);
                 article.appendChild(div_cart__item__content__settings);
-                
+
             }).catch((error) => console.log("impossible de récupérer les données", error));
 
 
 
-            section.appendChild(article);
+        section.appendChild(article);
+
     }
 
 
 
 }
 
+//modification de la quantité addEventListener
+function onQteChange() {
+    var elements = document.getElementsByClassName('itemQuantity');
+
+    for (var i = 0; i < elements.length; i++) {
+
+        elements[i].addEventListener('change', function () {
+
+            console.log(this.value);
+        });
+    }
+
+
+}
+
 getCard();
+setTimeout(onQteChange, 2000);
+ /*
+window.addEventListener('load', (event) => {
+    alert(11);
+    onQteChange();
+    alert(22);
+});*/
+
+
