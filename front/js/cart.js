@@ -35,6 +35,7 @@ function getCard() {
                 h2.textContent = data.name;
                 let pColor = document.createElement('p');
                 pColor.textContent = elementObjJson.color;
+
                 let pPrix = document.createElement('p');
                 //convert string to amount
                 let price = data.price;
@@ -94,10 +95,39 @@ function onQteChange() {
     var elements = document.getElementsByClassName('itemQuantity');
 
     for (var i = 0; i < elements.length; i++) {
-
         elements[i].addEventListener('change', function () {
-
             console.log(this.value);
+            //récupération de l'élément article le plus proche
+            const closetArticle = this.closest('article');
+            const idClosetArticle = closetArticle.getAttribute('data-id') + closetArticle.getAttribute('data-color');
+            console.log(idClosetArticle);
+            let objJson = {
+                id: closetArticle.getAttribute('data-id'),
+                color: closetArticle.getAttribute('data-color'),
+                quantite: Number(this.value)
+            }
+            let produit = JSON.stringify(objJson);
+            localStorage.setItem(idClosetArticle, produit);
+        });
+    }
+
+
+}
+
+
+//modification de la quantité addEventListener
+function onDelete() {
+    var elements = document.getElementsByClassName('deleteItem');
+
+    for (var i = 0; i < elements.length; i++) {
+        elements[i].addEventListener('click', function () {
+            //récupération de l'élément article le plus proche
+            const closetArticle = this.closest('article');
+            const idClosetArticle = closetArticle.getAttribute('data-id') + closetArticle.getAttribute('data-color');
+            console.log(idClosetArticle);
+
+            localStorage.removeItem(idClosetArticle);
+            closetArticle.remove();
         });
     }
 
@@ -106,11 +136,13 @@ function onQteChange() {
 
 getCard();
 setTimeout(onQteChange, 2000);
+setTimeout(onDelete, 2000);
+function calculTotal() { }
  /*
 window.addEventListener('load', (event) => {
-    alert(11);
-    onQteChange();
-    alert(22);
+alert(11);
+onQteChange();
+alert(22);
 });*/
 
 

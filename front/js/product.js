@@ -43,7 +43,7 @@ function getProduct() {
                 couleur.appendChild(option);
             }
 
-            //reuperation des données envoyé par localstorage
+            //récupération des données envoyées par localstorage
 
             let addToCartButton = document.getElementById('addToCart');
             addToCartButton.addEventListener('click', function (e) {
