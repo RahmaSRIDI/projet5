@@ -163,3 +163,67 @@ async function calculTotal(totalQuantity, totalPrice) {
 }
 
 
+async function onPostForm() {
+    console.log("onPostForm");
+    var firstName = document.getElementById('firstName').value;
+    var lastName = document.getElementById('lastName').value;
+    var address = document.getElementById('address').value;
+    var city = document.getElementById('city').value;
+    var email = document.getElementById('email').value;
+
+
+
+
+    let contact = {
+        firstName: firstName,
+        lastName: lastName,
+        address: address,
+        city: city,
+        email: email
+
+    }
+
+
+    var products = [];
+    for (var i = 0; i < localStorage.length; i++) {
+        var key = localStorage.key(i);
+        var elementObjJson = JSON.parse(localStorage.getItem(key));
+        products[i] = elementObjJson.id;
+    }
+
+    console.log("1");
+    console.log("2",JSON.stringify({ contact: contact, products: products }));
+    const rawResponse = fetch('http://localhost:3000/api/products/order', {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ contact: contact, products: products })
+    });
+    console.log("3");
+    const content = rawResponse();
+    console.log("4");
+    console.log(content);
+
+    console.log("5");
+
+
+
+
+
+
+
+}
+
+//suppression de la quantité addEventListener
+async function addSubmitListener() {
+    console.log("addSubmitListener");
+    var elements = document.getElementById('order');
+
+    elements.addEventListener('click', function () {
+        onPostForm();
+    });
+}
+
+addSubmitListener();
