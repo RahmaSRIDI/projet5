@@ -1,3 +1,14 @@
+// Récupérer des données depuis sessionStorage
+var orderId = sessionStorage.getItem('orderId');
+if (orderId != undefined) {
+    location.href = 'confirmation.html?orderId=' + orderId;
+
+}
+// Supprimer toutes les données de sessionStorage
+sessionStorage.clear();
+
+
+
 async function getApi(idProduit) {
     var productURL = "http://localhost:3000/api/products/" + idProduit;
     const response = await fetch(productURL);
@@ -149,8 +160,6 @@ async function onDelete() {
 
 }
 
-getCard();
-
 
 async function calculTotal(totalQuantity, totalPrice) {
     var tagTotalQuantity = document.getElementById('totalQuantity');
@@ -163,7 +172,7 @@ async function calculTotal(totalQuantity, totalPrice) {
 }
 
 
-async function onPostForm() {
+function onPostForm() {
     console.log("onPostForm");
     var firstName = document.getElementById('firstName').value;
     var lastName = document.getElementById('lastName').value;
@@ -200,18 +209,25 @@ async function onPostForm() {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
             },
+            redirect: "manual",
             body: JSON.stringify({ contact: contact, products: products })
         });
         console.log("3");
         const content = await rawResponse.json();
         console.log("4");
-        console.log(content);
+        console.log("orderId====" + content.orderId);
+        orderId = content.orderId;
+
+
     })();
     console.log("5");
+    // Enregistrer des données dans sessionStorage
+    sessionStorage.setItem('orderId', orderId);
 
 }
 
-//suppression de la quantité addEventListener
+
+
 async function addSubmitListener() {
     console.log("addSubmitListener");
     var elements = document.getElementById('order');
@@ -221,4 +237,5 @@ async function addSubmitListener() {
     });
 }
 
-addSubmitListener();
+getCard();
+//addSubmitListener();
