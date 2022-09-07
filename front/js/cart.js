@@ -192,27 +192,22 @@ async function onPostForm() {
     }
 
     console.log("1");
-    console.log("2",JSON.stringify({ contact: contact, products: products }));
-    const rawResponse = fetch('http://localhost:3000/api/products/order', {
-        method: 'POST',
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ contact: contact, products: products })
-    });
-    console.log("3");
-    const content = rawResponse();
-    console.log("4");
-    console.log(content);
-
+    (async () => {
+        console.log("2");
+        const rawResponse = await fetch('http://localhost:3000/api/products/order', {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ contact: contact, products: products })
+        });
+        console.log("3");
+        const content = await rawResponse.json();
+        console.log("4");
+        console.log(content);
+    })();
     console.log("5");
-
-
-
-
-
-
 
 }
 
