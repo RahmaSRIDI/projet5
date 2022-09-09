@@ -1,15 +1,18 @@
-// Récupérer des données depuis sessionStorage
-var orderId = sessionStorage.getItem('orderId');
+// Récupérer des données depuis localStorage après validation du panier
+var orderId = localStorage.getItem('orderId');
 if (orderId != undefined) {
+    //redirection vers la page confirmation
     location.href = 'confirmation.html?orderId=' + orderId;
+    // Supprimer toutes les données de localStorage
 
+    localStorage.clear();
 }
-// Supprimer toutes les données de sessionStorage
-sessionStorage.clear();
 
 
 
-async function getApi(idProduit) {
+
+
+async function getProductById(idProduit) {
     var productURL = "http://localhost:3000/api/products/" + idProduit;
     const response = await fetch(productURL);
     const obj = await response.json();
@@ -19,8 +22,7 @@ async function getApi(idProduit) {
 
 
 async function getCard() {
-    let totalQuantity = 0;
-    let totalPrice = 0;
+
     var section = document.getElementById('cart__items');
 
     for (var i = 0; i < localStorage.length; i++) {
@@ -35,12 +37,11 @@ async function getCard() {
         let div_cart__item__img = document.createElement('div');
         div_cart__item__img.setAttribute('class', 'cart__item__img');
 
-        var productURL = "http://localhost:3000/api/products/" + elementObjJson.id;
-        let data = await getApi(elementObjJson.id);
+        let data = await getProductById(elementObjJson.id);
         (async () => {
 
 
-            console.log(elementObjJson.color);
+
 
             let imgTag = document.createElement('img');
             imgTag.src = data.imageUrl;
@@ -61,7 +62,7 @@ async function getCard() {
             let pPrix = document.createElement('p');
             //convert string to amount
             let price = data.price;
-            totalPrice = totalPrice + Number(price);
+
             let priceText = price.toLocaleString("fr-FR", { style: "currency", currency: "EUR" });
             pPrix.textContent = priceText;
 
@@ -83,7 +84,7 @@ async function getCard() {
             input.setAttribute('min', 1);
             input.setAttribute('max', 100);
             input.setAttribute('value', elementObjJson.quantite);
-            totalQuantity = totalQuantity + Number(elementObjJson.quantite);
+
             div_cart__item__content__settings__quantity.appendChild(pQte);
             div_cart__item__content__settings__quantity.appendChild(input);
             div_cart__item__content__settings.appendChild(div_cart__item__content__settings__quantity);
@@ -115,11 +116,12 @@ async function getCard() {
 
     await onQteChange();
     await onDelete();
-    await calculTotal(totalQuantity, totalPrice);
+    //await writeTotal(totalQuantity, totalPrice);
 }
 
 //modification de la quantité addEventListener
 async function onQteChange() {
+
     var elements = document.getElementsByClassName('itemQuantity');
 
     for (var i = 0; i < elements.length; i++) {
@@ -135,6 +137,7 @@ async function onQteChange() {
             }
             let produit = JSON.stringify(objJson);
             localStorage.setItem(idClosetArticle, produit);
+            calculTotal();
         });
     }
 
@@ -154,14 +157,16 @@ async function onDelete() {
 
             localStorage.removeItem(idClosetArticle);
             closetArticle.remove();
+            calculTotal();
         });
     }
 
-
+    calculTotal();
 }
 
+// affichage du total après calcul
 
-async function calculTotal(totalQuantity, totalPrice) {
+async function writeTotal(totalQuantity, totalPrice) {
     var tagTotalQuantity = document.getElementById('totalQuantity');
     tagTotalQuantity.textContent = totalQuantity;
     var tagTotalPrice = document.getElementById('totalPrice');
@@ -171,16 +176,38 @@ async function calculTotal(totalQuantity, totalPrice) {
     tagTotalPrice.textContent = formatter.format(totalPrice);
 }
 
+/*recalcul le total des prix et quantités */
+async function calculTotal() {
+    console.log("qteChanged");
+    let qteTotal = 0;
+    let priceTotal = 0;
+
+    for (var i = 0; i < localStorage.length; i++) {
+
+        var key = localStorage.key(i);
+        var elementObjJson = JSON.parse(localStorage.getItem(key));
+        qteTotal = Number(qteTotal) + Number(elementObjJson.quantite);
+        let data = await getProductById(elementObjJson.id);
+
+        let price = data.price;
+        priceTotal = Number(priceTotal) + (Number(price) * Number(elementObjJson.quantite));
+
+
+    }
+
+    writeTotal(qteTotal, priceTotal);
+}
+
+
+//on click sur le bouton commander
 
 function onPostForm() {
-    console.log("onPostForm");
+
     var firstName = document.getElementById('firstName').value;
     var lastName = document.getElementById('lastName').value;
     var address = document.getElementById('address').value;
     var city = document.getElementById('city').value;
     var email = document.getElementById('email').value;
-
-
 
 
     let contact = {
@@ -200,10 +227,11 @@ function onPostForm() {
         products[i] = elementObjJson.id;
     }
 
-    console.log("1");
+
+    //envoi de la requette post avec les parametere dans le body
+
     (async () => {
-        console.log("2");
-        const rawResponse = await fetch('http://localhost:3000/api/products/order', {
+        const response = await fetch('http://localhost:3000/api/products/order', {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -212,24 +240,26 @@ function onPostForm() {
             redirect: "manual",
             body: JSON.stringify({ contact: contact, products: products })
         });
-        console.log("3");
-        const content = await rawResponse.json();
-        console.log("4");
+
+        const content = await response.json();
+
         console.log("orderId====" + content.orderId);
         orderId = content.orderId;
 
 
     })();
-    console.log("5");
+
     // Enregistrer des données dans sessionStorage
-    sessionStorage.setItem('orderId', orderId);
+    localStorage.setItem('orderId', 5554);
+    //localStorage.setItem('orderId', orderId);
 
 }
 
 
 
+//ajouter l'évennent click
 async function addSubmitListener() {
-    console.log("addSubmitListener");
+
     var elements = document.getElementById('order');
 
     elements.addEventListener('click', function () {
@@ -238,4 +268,4 @@ async function addSubmitListener() {
 }
 
 getCard();
-//addSubmitListener();
+addSubmitListener();

@@ -68,15 +68,9 @@ function getProduct() {
                     if (localStorage.getItem(idFromUrl + colorSelected) !== null) {
                         let existedObjJson = JSON.parse(localStorage.getItem(idFromUrl + colorSelected));
                         //element existe 
-                        //donc vérification de la couleur
-                        console.log(`element and color existe `);
-                        console.log(`existedObjJson===`, existedObjJson);
-                        console.log(`Number(objJson.quantite===`, Number(objJson.quantite));
-                        console.log(`Number(existedObjJson.quantite)== `, Number(existedObjJson.quantite));
+                                            
                         objJson.quantite = Number(objJson.quantite) + Number(existedObjJson.quantite);
                     }
-
-
 
                     let produit = JSON.stringify(objJson);
                     localStorage.setItem(idFromUrl + objJson.color, produit);

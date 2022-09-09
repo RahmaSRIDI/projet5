@@ -1,5 +1,5 @@
 function getOrderIdFromUrl() {
-    console.log("in getOrderIdFromUrl");
+    
     /*récupération de l'id à partir de l'URL */
     var str = document.URL;
     var url = new URL(str);
