@@ -9,9 +9,7 @@ if (orderId != undefined) {
 }
 
 
-
-
-
+//fontion géneriquepour récupérer un produit depuis l'API
 async function getProductById(idProduit) {
     var productURL = "http://localhost:3000/api/products/" + idProduit;
     const response = await fetch(productURL);
@@ -20,7 +18,7 @@ async function getProductById(idProduit) {
 }
 
 
-
+//remplissage des card selon le local storage (produit choisis)
 async function getCard() {
 
     var section = document.getElementById('cart__items');
@@ -114,7 +112,9 @@ async function getCard() {
     }
 
 
+    //ajouter l'evennement (quantité changé)
     await onQteChange();
+    //ajouter l'evennement (supprission d'un produit)
     await onDelete();
     //await writeTotal(totalQuantity, totalPrice);
 }
@@ -137,6 +137,7 @@ async function onQteChange() {
             }
             let produit = JSON.stringify(objJson);
             localStorage.setItem(idClosetArticle, produit);
+            //actualiser le total après chaque modification de qte d'un produit
             calculTotal();
         });
     }
@@ -158,14 +159,15 @@ async function onDelete() {
             localStorage.removeItem(idClosetArticle);
             closetArticle.remove();
             calculTotal();
+            alert("Votre produit a été supprimé");
         });
     }
 
+    //actualiser le total après chaque supprision d'un produit
     calculTotal();
 }
 
 // affichage du total après calcul
-
 async function writeTotal(totalQuantity, totalPrice) {
     var tagTotalQuantity = document.getElementById('totalQuantity');
     tagTotalQuantity.textContent = totalQuantity;
@@ -200,7 +202,6 @@ async function calculTotal() {
 
 
 //on click sur le bouton commander
-
 function onPostForm() {
 
     var firstName = document.getElementById('firstName').value;
@@ -209,53 +210,120 @@ function onPostForm() {
     var city = document.getElementById('city').value;
     var email = document.getElementById('email').value;
 
+    //expressions régulières pour la validation du form
+    const regName = /^[a-zA-Z]+$/;
+    const regAdress = /^[a-zA-Z]+ [a-zA-Z]+$/;
+    const regEmailAdress = /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
 
-    let contact = {
-        firstName: firstName,
-        lastName: lastName,
-        address: address,
-        city: city,
-        email: email
+    var isValidForm = true;
+    //validation du form
+    if (!regName.test(firstName)) {
+        alert('Prénom non valide.');
+        isValidForm = disableSubmit(isValidForm);
+
 
     }
-
-
-    var products = [];
-    for (var i = 0; i < localStorage.length; i++) {
-        var key = localStorage.key(i);
-        var elementObjJson = JSON.parse(localStorage.getItem(key));
-        products[i] = elementObjJson.id;
+    else if (!regName.test(lastName)) {
+        alert('Nom non valide.');
+        isValidForm = disableSubmit(isValidForm);
+    }
+    /* else if (!regAdress.test(address)) {
+        alert('Adresse non valide.');
+        isValidForm = disableSubmit(isValidForm);
+    } */
+    else if (!regName.test(city)) {
+        alert('Ville non valide.');
+        isValidForm = disableSubmit(isValidForm);
+    }
+    else if (!regEmailAdress.test(email)) {
+        alert('Email non valide.');
+        isValidForm = disableSubmit(isValidForm);
+    }
+    else if (localStorage.length == 0) {
+        alert('Veuillez ajouter des produits dans le panier')
+        isValidForm = disableSubmit(isValidForm);
     }
 
+    //si le formulaire est correct
+    if (isValidForm !== false) {
+        let contact = {
+            firstName: firstName,
+            lastName: lastName,
+            address: address,
+            city: city,
+            email: email
 
-    //envoi de la requette post avec les parametere dans le body
-
-    (async () => {
-        const response = await fetch('http://localhost:3000/api/products/order', {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            redirect: "manual",
-            body: JSON.stringify({ contact: contact, products: products })
-        });
-
-        const content = await response.json();
-
-        console.log("orderId====" + content.orderId);
-        orderId = content.orderId;
+        }
 
 
-    })();
+        var products = [];
+        for (var i = 0; i < localStorage.length; i++) {
+            var key = localStorage.key(i);
+            var elementObjJson = JSON.parse(localStorage.getItem(key));
+            products[i] = elementObjJson.id;
+        }
 
-    // Enregistrer des données dans sessionStorage
-    localStorage.setItem('orderId', 5554);
-    //localStorage.setItem('orderId', orderId);
 
+        //envoi de la requette post avec les parametere dans le body
+
+        /*  (async () => {
+             const response = await fetch('http://localhost:3000/api/products/order', {
+                 method: 'POST',
+                 headers: {
+                     'Accept': 'application/json',
+                     'Content-Type': 'application/json'
+                 },
+                 redirect: "manual",
+                 body: JSON.stringify({ contact: contact, products: products })
+             });
+ 
+             const content = await response.json();
+ 
+             console.log("orderId====" + content.orderId);
+             orderId = content.orderId;
+ 
+ 
+         })(); */
+
+        console.log('0');
+        (async () => {
+            const fetchPromise = fetch('http://localhost:3000/api/products/order', {
+                method: 'post',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                mode: 'cors',
+                body: JSON.stringify({ contact: contact, products: products })
+            });
+            fetchPromise.then(response => {
+                return response.json();
+            }).then(people => {
+                console.log('2');
+                console.log(people.orderId);
+                console.log('3');
+                orderId = people.orderId;
+                console.log('4');
+                localStorage.setItem('orderId', orderId);
+            });
+        })();
+        // Enregistrer des données dans sessionStorage
+        //localStorage.setItem('orderId', 5554);
+
+    }
 }
 
 
+//arréter la progression du submit (arréter refresh de la page) //TODO ne fonctionne pas encore
+function disableSubmit(isValidForm) {
+    document.querySelector("#order").addEventListener("click", function (event) {
+        console.log("Désolé ! preventDefault() ne vous laissera pas cocher ceci.");
+        event.preventDefault();
+    }, false);
+
+
+    return false;
+}
 
 //ajouter l'évennent click
 async function addSubmitListener() {
@@ -269,3 +337,7 @@ async function addSubmitListener() {
 
 getCard();
 addSubmitListener();
+var forms = document.querySelectorAll('.cart__order__form');
+for (var i = 0; i < forms.length; i++) {
+    forms[i].setAttribute('novalidate', true);
+}

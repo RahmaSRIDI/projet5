@@ -74,6 +74,11 @@ function getProduct() {
 
                     let produit = JSON.stringify(objJson);
                     localStorage.setItem(idFromUrl + objJson.color, produit);
+                    alert("Votre produit a été ajouté");
+                    colorSelectedTag.getElementsByTagName('option')[0].selected = 'selected'
+
+                    quantiteSelectedTag.value=0;
+
                 }
                 else {
                     alert("Veuillez choisir une couleur et un nombre d'article svp");
