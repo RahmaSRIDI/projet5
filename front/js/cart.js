@@ -9,7 +9,7 @@ if (orderId != undefined) {
 }
 
 
-//fontion géneriquepour récupérer un produit depuis l'API
+//fontion génerique pour récupérer un produit depuis l'API
 async function getProductById(idProduit) {
     var productURL = "http://localhost:3000/api/products/" + idProduit;
     const response = await fetch(productURL);
@@ -244,7 +244,7 @@ function onPostForm() {
         isValidForm = disableSubmit(isValidForm);
     }
 
-    //si le formulaire est correct
+    //si le formulaire est correct retourne objet de contact et tableau de produit
     if (isValidForm !== false) {
         let contact = {
             firstName: firstName,
@@ -255,7 +255,7 @@ function onPostForm() {
 
         }
 
-
+// remplissage du tableau de produits à partir de localstorage
         var products = [];
         for (var i = 0; i < localStorage.length; i++) {
             var key = localStorage.key(i);
@@ -263,7 +263,7 @@ function onPostForm() {
             products[i] = elementObjJson.id;
         }
 
-
+//appel de l'API par la methode POST et recupération de OrderId
         (async () => {
             const fetchPromise = fetch('http://localhost:3000/api/products/order', {
                 method: 'post',
@@ -295,8 +295,6 @@ function disableSubmit(isValidForm) {
         event.stopPropagation();
     }, false);
 
-
-    
     
     return false;
 }
@@ -314,6 +312,8 @@ async function addSubmitListener() {
 
 getCard();
 addSubmitListener();
+
+//desactiver la validation automatique de formulaire HTML5
 var forms = document.querySelectorAll('.cart__order__form');
 for (var i = 0; i < forms.length; i++) {
     forms[i].setAttribute('novalidate', true);
