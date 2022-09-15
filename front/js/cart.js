@@ -180,7 +180,7 @@ async function writeTotal(totalQuantity, totalPrice) {
 
 /*recalcul le total des prix et quantités */
 async function calculTotal() {
-    console.log("qteChanged");
+
     let qteTotal = 0;
     let priceTotal = 0;
 
@@ -212,7 +212,7 @@ function onPostForm() {
 
     //expressions régulières pour la validation du form
     const regName = /^[a-zA-Z]+$/;
-    const regAdress = /^[a-zA-Z]+ [a-zA-Z]+$/;
+    const regAdress = /^[0-9]+ [a-zA-Z]+$/;
     const regEmailAdress = /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
 
     var isValidForm = true;
@@ -227,10 +227,10 @@ function onPostForm() {
         alert('Nom non valide.');
         isValidForm = disableSubmit(isValidForm);
     }
-    /* else if (!regAdress.test(address)) {
+    else if (!regAdress.test(address)) {
         alert('Adresse non valide.');
         isValidForm = disableSubmit(isValidForm);
-    } */
+    }
     else if (!regName.test(city)) {
         alert('Ville non valide.');
         isValidForm = disableSubmit(isValidForm);
@@ -264,28 +264,6 @@ function onPostForm() {
         }
 
 
-        //envoi de la requette post avec les parametere dans le body
-
-        /*  (async () => {
-             const response = await fetch('http://localhost:3000/api/products/order', {
-                 method: 'POST',
-                 headers: {
-                     'Accept': 'application/json',
-                     'Content-Type': 'application/json'
-                 },
-                 redirect: "manual",
-                 body: JSON.stringify({ contact: contact, products: products })
-             });
- 
-             const content = await response.json();
- 
-             console.log("orderId====" + content.orderId);
-             orderId = content.orderId;
- 
- 
-         })(); */
-
-        console.log('0');
         (async () => {
             const fetchPromise = fetch('http://localhost:3000/api/products/order', {
                 method: 'post',
@@ -298,12 +276,9 @@ function onPostForm() {
             });
             fetchPromise.then(response => {
                 return response.json();
-            }).then(people => {
-                console.log('2');
-                console.log(people.orderId);
-                console.log('3');
-                orderId = people.orderId;
-                console.log('4');
+            }).then(data => {
+
+                orderId = data.orderId;
                 localStorage.setItem('orderId', orderId);
             });
         })();
@@ -317,11 +292,12 @@ function onPostForm() {
 //arréter la progression du submit (arréter refresh de la page) //TODO ne fonctionne pas encore
 function disableSubmit(isValidForm) {
     document.querySelector("#order").addEventListener("click", function (event) {
-        console.log("Désolé ! preventDefault() ne vous laissera pas cocher ceci.");
-        event.preventDefault();
+        event.stopPropagation();
     }, false);
 
 
+    
+    
     return false;
 }
 
@@ -334,6 +310,7 @@ async function addSubmitListener() {
         onPostForm();
     });
 }
+
 
 getCard();
 addSubmitListener();
