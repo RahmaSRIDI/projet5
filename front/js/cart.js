@@ -1,14 +1,3 @@
-// Récupérer des données depuis localStorage après validation du panier
-var orderId = localStorage.getItem('orderId');
-if (orderId != undefined) {
-    //redirection vers la page confirmation
-    location.href = 'confirmation.html?orderId=' + orderId;
-    // Supprimer toutes les données de localStorage
-
-    localStorage.clear();
-}
-
-
 //fontion génerique pour récupérer un produit depuis l'API
 async function getProductById(idProduit) {
     var productURL = "http://localhost:3000/api/products/" + idProduit;
@@ -212,7 +201,7 @@ function onPostForm() {
 
     //expressions régulières pour la validation du form
     const regName = /^[a-zA-Z]+$/;
-    const regAdress = /^[0-9]+ [a-zA-Z]+$/;
+    const regAdress = /^\s*\S+(?:\s+\S+){2}/;
     const regEmailAdress = /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
 
     var isValidForm = true;
@@ -255,7 +244,7 @@ function onPostForm() {
 
         }
 
-// remplissage du tableau de produits à partir de localstorage
+        // remplissage du tableau de produits à partir de localstorage
         var products = [];
         for (var i = 0; i < localStorage.length; i++) {
             var key = localStorage.key(i);
@@ -263,7 +252,7 @@ function onPostForm() {
             products[i] = elementObjJson.id;
         }
 
-//appel de l'API par la methode POST et recupération de OrderId
+        //appel de l'API par la methode POST et recupération de OrderId
         (async () => {
             const fetchPromise = fetch('http://localhost:3000/api/products/order', {
                 method: 'post',
@@ -279,11 +268,19 @@ function onPostForm() {
             }).then(data => {
 
                 orderId = data.orderId;
-                localStorage.setItem('orderId', orderId);
+
+                if (orderId != undefined) {
+                    //redirection vers la page confirmation
+                    location.href = 'confirmation.html?orderId=' + orderId;
+                    // Supprimer toutes les données de localStorage
+
+                    localStorage.clear();
+                }
             });
+            //localStorage.setItem('orderId', 5554);
         })();
-        // Enregistrer des données dans sessionStorage
-        //localStorage.setItem('orderId', 5554);
+
+
 
     }
 }
@@ -295,7 +292,7 @@ function disableSubmit(isValidForm) {
         event.stopPropagation();
     }, false);
 
-    
+
     return false;
 }
 
@@ -312,9 +309,11 @@ async function addSubmitListener() {
 
 getCard();
 addSubmitListener();
-
 //desactiver la validation automatique de formulaire HTML5
 var forms = document.querySelectorAll('.cart__order__form');
 for (var i = 0; i < forms.length; i++) {
     forms[i].setAttribute('novalidate', true);
 }
+//changer bouton type à button à la place submit
+var orderButton = document.getElementById('order');
+orderButton.setAttribute('type', 'button');
