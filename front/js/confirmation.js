@@ -1,13 +1,11 @@
-function getOrderIdFromUrl() {
 
-    /*récupération de l'id à partir de l'URL */
+   //recuperation de l'orderId à partir de l'URL 
+function getOrderIdFromUrl() {
     var str = document.URL;
     var url = new URL(str);
     var orderIdFromUrl = url.searchParams.get("orderId");
-    console.log("orderIdFromUrl==" + orderIdFromUrl);
     fillOrderId(orderIdFromUrl);
 }
-
 function fillOrderId(orderId) {
     var elements = document.getElementById('orderId');
     elements.textContent = orderId;

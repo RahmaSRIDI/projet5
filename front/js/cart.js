@@ -1,3 +1,10 @@
+//expressions régulières (regex) pour la validation du form
+const regName = /^[a-zA-Z]+$/;
+const regAdress = /^\s*\S+(?:\s+\S+){2}/;
+const regEmailAdress = /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
+const regQteMaxAndMin = /^.{1,100}$/
+var isValidForm = false;
+
 //fontion génerique pour récupérer un produit depuis l'API
 async function getProductById(idProduit) {
     var productURL = "http://localhost:3000/api/products/" + idProduit;
@@ -7,11 +14,9 @@ async function getProductById(idProduit) {
 }
 
 
-//remplissage des card selon le local storage (produit choisis)
+//remplissage du panier selon le local storage (produit choisis)
 async function getCard() {
-
     var section = document.getElementById('cart__items');
-
     for (var i = 0; i < localStorage.length; i++) {
         var key = localStorage.key(i);
         var elementObjJson = JSON.parse(localStorage.getItem(key));
@@ -29,11 +34,8 @@ async function getCard() {
 
 
 
-
-            let imgTag = document.createElement('img');
-            imgTag.src = data.imageUrl;
-            imgTag.alt = data.altTxt;
-            div_cart__item__img.appendChild(imgTag);
+            //création du tag Img
+            createImgTag(data, div_cart__item__img);
 
             article.appendChild(div_cart__item__img);
 
@@ -64,13 +66,8 @@ async function getCard() {
             let div_cart__item__content__settings__quantity = document.createElement('div');
             let pQte = document.createElement('p');
             pQte.textContent = "Qté : ";
-            let input = document.createElement('input');
-            input.setAttribute('type', 'number');
-            input.setAttribute('class', 'itemQuantity');
-            input.setAttribute('name', 'itemQuantity');
-            input.setAttribute('min', 1);
-            input.setAttribute('max', 100);
-            input.setAttribute('value', elementObjJson.quantite);
+            //création de l'élement input
+            let input = CreateInputTag(elementObjJson);
 
             div_cart__item__content__settings__quantity.appendChild(pQte);
             div_cart__item__content__settings__quantity.appendChild(input);
@@ -106,6 +103,52 @@ async function getCard() {
     //ajouter l'evennement (supprission d'un produit)
     await onDelete();
     //await writeTotal(totalQuantity, totalPrice);
+}
+
+//création de l'élement input
+function CreateInputTag(elementObjJson) {
+    let input = document.createElement('input');
+    input.setAttribute('type', 'number');
+    input.setAttribute('class', 'itemQuantity');
+    input.setAttribute('name', 'itemQuantity');
+    input.setAttribute('min', 1);
+    input.setAttribute('max', 100);
+    input.setAttribute('value', elementObjJson.quantite);
+
+    checkMaxMinQte(input);
+    return input;
+}
+//création de l'élement Img
+function createImgTag(data, div_cart__item__img) {
+    let imgTag = document.createElement('img');
+    imgTag.src = data.imageUrl;
+    imgTag.alt = data.altTxt;
+    div_cart__item__img.appendChild(imgTag);
+}
+
+//validation de la valeur max et min du qte
+function checkMaxMinQte(input) {
+    input.onkeypress = e => {
+        //  13: enter, +: 43 , -: 45
+        if (13 == e.keyCode)
+            input.blur();
+        if ([43, 45].includes(e.keyCode))
+            return false;
+    };
+    const min = 1;
+    const max = 100;
+    input.onkeyup = e => {
+        if (parseFloat(input.value) < min) {
+            input.value = min;
+        }
+        else if (parseFloat(input.value) > max) {
+            input.value = max;
+        }
+        else {
+            input.value = parseFloat(input.value);
+        }
+
+    };
 }
 
 //modification de la quantité addEventListener
@@ -199,40 +242,12 @@ function onPostForm() {
     var city = document.getElementById('city').value;
     var email = document.getElementById('email').value;
 
-    //expressions régulières pour la validation du form
-    const regName = /^[a-zA-Z]+$/;
-    const regAdress = /^\s*\S+(?:\s+\S+){2}/;
-    const regEmailAdress = /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
-
-    var isValidForm = true;
-    //validation du form
-    if (!regName.test(firstName)) {
-        alert('Prénom non valide.');
-        isValidForm = disableSubmit(isValidForm);
-
-
-    }
-    else if (!regName.test(lastName)) {
-        alert('Nom non valide.');
-        isValidForm = disableSubmit(isValidForm);
-    }
-    else if (!regAdress.test(address)) {
-        alert('Adresse non valide.');
-        isValidForm = disableSubmit(isValidForm);
-    }
-    else if (!regName.test(city)) {
-        alert('Ville non valide.');
-        isValidForm = disableSubmit(isValidForm);
-    }
-    else if (!regEmailAdress.test(email)) {
-        alert('Email non valide.');
-        isValidForm = disableSubmit(isValidForm);
-    }
-    else if (localStorage.length == 0) {
+    if (!isValidForm)
+        alert('Veuillez remplir tout le formulaire.');
+    if (localStorage.length == 0) {
         alert('Veuillez ajouter des produits dans le panier')
         isValidForm = disableSubmit(isValidForm);
     }
-
     //si le formulaire est correct retourne objet de contact et tableau de produit
     if (isValidForm !== false) {
         let contact = {
@@ -273,26 +288,20 @@ function onPostForm() {
                     //redirection vers la page confirmation
                     location.href = 'confirmation.html?orderId=' + orderId;
                     // Supprimer toutes les données de localStorage
-
                     localStorage.clear();
                 }
             });
-            //localStorage.setItem('orderId', 5554);
         })();
-
-
 
     }
 }
 
 
-//arréter la progression du submit (arréter refresh de la page) //TODO ne fonctionne pas encore
+//arréter la progression du submit (arréter refresh de la page)
 function disableSubmit(isValidForm) {
     document.querySelector("#order").addEventListener("click", function (event) {
         event.stopPropagation();
     }, false);
-
-
     return false;
 }
 
@@ -309,6 +318,7 @@ async function addSubmitListener() {
 
 getCard();
 addSubmitListener();
+validationFormulaire();
 //desactiver la validation automatique de formulaire HTML5
 var forms = document.querySelectorAll('.cart__order__form');
 for (var i = 0; i < forms.length; i++) {
@@ -317,3 +327,74 @@ for (var i = 0; i < forms.length; i++) {
 //changer bouton type à button à la place submit
 var orderButton = document.getElementById('order');
 orderButton.setAttribute('type', 'button');
+
+//validation du formulaire
+function validationFormulaire() {
+    const firstNameInput = document.getElementById('firstName')
+
+    firstNameInput.addEventListener('blur', (event) => {
+        if (!regName.test(firstNameInput.value)) {
+            const firstNameErrorMsg = document.getElementById('firstNameErrorMsg')
+            firstNameErrorMsg.textContent = 'Prénom non valide!'
+            isValidForm = false;
+        }
+        else {
+            firstNameErrorMsg.textContent = '';
+            isValidForm = true;
+        }
+    });
+    const lastNameInput = document.getElementById('lastName')
+    lastNameInput.addEventListener('blur', (event) => {
+        if (!regName.test(lastNameInput.value)) {
+            const lastNameErrorMsg = document.getElementById('lastNameErrorMsg')
+            lastNameErrorMsg.textContent = 'Nom non valide!'
+            isValidForm = false;
+        }
+        else {
+            lastNameErrorMsg.textContent = '';
+            isValidForm = true;
+        }
+
+    });
+    const addressInput = document.getElementById('address')
+    addressInput.addEventListener('blur', (event) => {
+        if (!regAdress.test(addressInput.value)) {
+            const addressErrorMsg = document.getElementById('addressErrorMsg')
+            addressErrorMsg.textContent = 'Adress non valide!'
+            isValidForm = false;
+        }
+        else {
+            addressErrorMsg.textContent = '';
+            isValidForm = true;
+        }
+    });
+    const cityInput = document.getElementById('city')
+    cityInput.addEventListener('blur', (event) => {
+        if (!regName.test(cityInput.value)) {
+            const cityErrorMsg = document.getElementById('cityErrorMsg')
+            cityErrorMsg.textContent = 'Ville non valide!'
+            isValidForm = false;
+        }
+        else {
+            cityErrorMsg.textContent = '';
+            isValidForm = true;
+        }
+    });
+    const emailInput = document.getElementById('email')
+    emailInput.addEventListener('blur', (event) => {
+
+        if (!regEmailAdress.test(emailInput.value)) {
+            const emailErrorMsg = document.getElementById('emailErrorMsg')
+            emailErrorMsg.textContent = 'Email non valide!'
+            isValidForm = false;
+        }
+        else {
+            emailErrorMsg.textContent = '';
+            isValidForm = true;
+        }
+    });
+
+}
+
+
+
